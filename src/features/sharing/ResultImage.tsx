@@ -1,6 +1,5 @@
 "use client";
 import React, { useRef, useState } from "react";
-// import html2canvas from "html2canvas"; // 정적 import 제거
 
 const SNS = [
   {
@@ -43,24 +42,7 @@ export default function ResultImage({ result }: ResultImageProps) {
   const handleCapture = async () => {
     setLoading(true);
     setFeedback("");
-    try {
-      if (!captureRef.current) return;
-      const html2canvas = (await import('html2canvas')).default;
-      const canvas = await html2canvas(captureRef.current, {
-        width: 1080,
-        height: 1920,
-        scale: 2,
-        backgroundColor: null,
-        useCORS: true,
-      });
-      const url = canvas.toDataURL("image/png");
-      setImgUrl(url);
-      setFeedback("이미지 변환 성공! 아래에서 다운로드/공유하세요.");
-    } catch (e) {
-      setFeedback("이미지 변환 실패. 다시 시도해 주세요.");
-    } finally {
-      setLoading(false);
-    }
+    // html2canvas 및 임시 캡처 코드 전체 삭제. 새로운 방식 적용 예정.
   };
 
   const handleDownload = () => {

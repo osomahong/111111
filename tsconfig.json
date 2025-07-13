@@ -34,5 +34,9 @@
     ".next/types/**/*.ts",
     "vitest"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "playwright.config.ts",
+    "e2e"
+  ]
 }
