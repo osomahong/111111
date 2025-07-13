@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "node-fetch": "^2.7.0",
+    "react-responsive": "^10.0.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1"
+  }
+}
