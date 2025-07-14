@@ -70,6 +70,14 @@ ${input.body}
     });
     const data = await res.json();
     console.log('GEMINI API RESPONSE', JSON.stringify(data));
+    // 쿼터/요금제 초과 등 에러 감지
+    if (data.error && (
+      data.error.message?.toLowerCase().includes('quota') ||
+      data.error.message?.toLowerCase().includes('billing') ||
+      data.error.message?.toLowerCase().includes('rate limit')
+    )) {
+      return { result: '', blocked: true, reason: 'quota' };
+    }
     // 안전 필터링 결과 확인
     const candidate = data.candidates?.[0];
     if (candidate?.finishReason === 'SAFETY') {
@@ -114,6 +122,10 @@ export async function POST(req: NextRequest) {
     // Gemini API 호출 (입력/출력 모두 safety_settings 적용)
     const { result, blocked, reason } = await translateWithGemini({ sender: '', receiver: '', body: text });
     if (blocked) {
+      if (reason === 'quota') {
+        const err = { error: 'AI 번역 쿼터가 초과되어 잠시 이용이 제한됩니다. 잠시 후 다시 시도해 주세요.', reason };
+        return isTestEnv() ? { ...err, status: 429 } : NextResponse.json(err, { status: 429 });
+      }
       const err = { error: '안전 필터에 의해 차단된 콘텐츠입니다.', reason };
       return isTestEnv() ? { ...err, status: 400 } : NextResponse.json(err, { status: 400 });
     }
