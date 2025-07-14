@@ -3,6 +3,8 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const { put } = require('@vercel/blob');
+require('dotenv').config();
 
 const app = express();
 app.use(cors({
@@ -21,6 +23,9 @@ function extractIdFromUrl(url) {
   return match ? match[1] : null;
 }
 
+const BLOB_URL = process.env.BLOB_URL || 'https://oow7izfiyiwfutsa.public.blob.vercel-storage.com';
+const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN; // Vercel Blob Storage의 Read/Write 토큰
+
 app.post('/api/capture', async (req, res) => {
   const { url, selector, format = 'png', quality, fullPage = false } = req.body;
   if (!url) return res.status(400).json({ error: 'url is required' });
@@ -29,9 +34,11 @@ app.post('/api/capture', async (req, res) => {
   const imagePath = path.join(__dirname, 'images', `${id}.${format}`);
   const imageUrl = `/images/${id}.${format}`;
 
-  // 파일이 이미 있으면 재생성하지 않고 바로 반환
+  // 파일이 이미 있으면 Blob Storage URL 반환
   if (fs.existsSync(imagePath)) {
-    return res.status(200).json({ imageUrl });
+    // Blob Storage에 업로드된 파일이 있으면 해당 URL 반환
+    const blobUrl = `${BLOB_URL}/images/${id}.${format}`;
+    return res.status(200).json({ imageUrl: blobUrl });
   }
 
   let browser;
@@ -48,7 +55,15 @@ app.post('/api/capture', async (req, res) => {
       imageBuffer = await page.screenshot({ type: format, quality, fullPage });
     }
     fs.writeFileSync(imagePath, imageBuffer);
-    res.status(200).json({ imageUrl });
+    // Blob Storage 업로드
+    const blobKey = `images/${id}.${format}`;
+    const putRes = await put(blobKey, imageBuffer, {
+      access: 'public',
+      token: BLOB_TOKEN,
+      contentType: 'image/png',
+    });
+    const blobUrl = putRes.url || `${BLOB_URL}/images/${id}.${format}`;
+    res.status(200).json({ imageUrl: blobUrl });
   } catch (e) {
     res.status(500).json({ error: e.message });
   } finally {
