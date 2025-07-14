@@ -45,14 +45,23 @@ function MailHeader({ onBack }) {
   );
 }
 
+// 안전하게 origin 결정
+const getOrigin = () => {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return process.env.NEXT_PUBLIC_BASE_URL || "https://111111-pi.vercel.app";
+};
+
 export default function ResultClient({ id, subject, sender, receiver, translatedText }) {
   const frameRef = useRef(null);
 
   useEffect(() => {
     if (!id) return;
-    const captureServer = process.env.NEXT_PUBLIC_CAPTURE_SERVER_URL || "http://localhost:4000";
+    // 환경변수 기반으로 이미지 서버 주소 결정
+    const captureServer = process.env.NEXT_PUBLIC_CAPTURE_SERVER_URL || "https://oow7izfiyiwfutsa.public.blob.vercel-storage.com";
     const imageUrl = `${captureServer}/images/${id}.png`;
-    const resultUrl = `http://localhost:3000/result/${id}`;
+    const resultUrl = `${getOrigin()}/result/${id}`;
     const checkAndCreateImage = async () => {
       try {
         console.log("[이미지 체크] id:", id, "imageUrl:", imageUrl);
@@ -60,13 +69,12 @@ export default function ResultClient({ id, subject, sender, receiver, translated
         console.log("[이미지 HEAD 결과]", res.status);
         if (res.status === 404) {
           console.log("[이미지 없음, 생성 요청]", resultUrl);
-          const createRes = await fetch(`${captureServer}/api/capture`, {
+          // Blob Storage에 업로드 요청 (capture-server가 Blob Storage로 업로드하도록 구현 필요)
+          await fetch(`/api/capture-image`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: resultUrl, selector: "#phone-frame", format: "png" }),
+            body: JSON.stringify({ url: resultUrl, id }),
           });
-          const createData = await createRes.json();
-          console.log("[이미지 생성 응답]", createRes.status, createData);
         }
       } catch (e) {
         console.error("[이미지 생성 에러]", e);

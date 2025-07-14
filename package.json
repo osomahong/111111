@@ -24,6 +24,7 @@
     "@radix-ui/react-toast": "^1.2.6",
     "@tanstack/react-query": "^5",
     "@types/html2canvas": "^0.5.35",
+    "@vercel/blob": "^1.1.1",
     "@vercel/kv": "^3.0.0",
     "autoprefixer": "10.4.20",
     "axios": "^1.7.9",

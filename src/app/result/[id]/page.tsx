@@ -5,14 +5,14 @@ import { kv } from '@vercel/kv';
 export async function generateMetadata(props: any) {
   const { params } = await props;
   const id = (await params).id;
-  const captureServer = process.env.CAPTURE_SERVER_URL || 'http://localhost:4000';
+  const captureServer = process.env.CAPTURE_SERVER_URL || process.env.NEXT_PUBLIC_CAPTURE_SERVER_URL || 'https://oow7izfiyiwfutsa.public.blob.vercel-storage.com';
   const ogImageUrl = `${captureServer}/images/${id}.png`;
   return {
     title: '결과 페이지',
     openGraph: {
       images: [ogImageUrl],
     },
-    metadataBase: new URL('http://localhost:3000'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://111111-pi.vercel.app'),
   };
 }
 
