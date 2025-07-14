@@ -28,7 +28,7 @@ function StatusBar() {
   );
 }
 
-function MailHeader({ onBack }) {
+function MailHeader({ onBack, showOriginal, setShowOriginal, sender, id, translatedText, originalText }) {
   return (
     <div className="flex justify-between items-center px-4 py-2 border-b border-[#f0f0f0]">
       <button
@@ -38,9 +38,39 @@ function MailHeader({ onBack }) {
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#007aff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <div className="flex gap-3">
-        <button className="p-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-      </div>
+      <button
+        className="px-3 py-1 rounded bg-[#007aff] text-white text-xs font-semibold hover:bg-[#005fcc] transition-colors"
+        onClick={() => {
+          if (!showOriginal) {
+            // 원문보기 버튼 클릭
+            if (typeof window !== 'undefined') {
+              const w = window as any;
+              w.dataLayer = w.dataLayer || [];
+              w.dataLayer.push({
+                event: 'click_result_origin_btn',
+                sender: sender?.name || '',
+                result_id: id,
+                real_content: (translatedText || '').replace(/\n/g, ' ').slice(0, 80)
+              });
+            }
+          } else {
+            // 속마음 보기 버튼 클릭
+            if (typeof window !== 'undefined') {
+              const w = window as any;
+              w.dataLayer = w.dataLayer || [];
+              w.dataLayer.push({
+                event: 'click_result_real_btn',
+                sender: sender?.name || '',
+                result_id: id,
+                origin_content: (originalText || '').replace(/\n/g, ' ').slice(0, 80)
+              });
+            }
+          }
+          setShowOriginal((v) => !v);
+        }}
+      >
+        {showOriginal ? '속마음 보기' : '원문보기'}
+      </button>
     </div>
   );
 }
@@ -53,11 +83,53 @@ const getOrigin = () => {
   return process.env.NEXT_PUBLIC_BASE_URL || "https://111111-pi.vercel.app";
 };
 
-export default function ResultClient({ id, subject, sender, receiver, translatedText }) {
+interface ResultClientProps {
+  id: string;
+  subject: string;
+  sender: any;
+  receiver: any;
+  translatedText: string;
+  originalText: string;
+}
+
+export default function ResultClient({ id, subject, sender, receiver, translatedText, originalText }: ResultClientProps) {
   const frameRef = useRef(null);
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [copyMsg, setCopyMsg] = useState("");
+  // 클립보드 복사 및 알림
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopyMsg("결과를 클립보드에 저장하였습니다.\n친구들에게 내가 받은 이메일의 속마음을 공유해주세요.");
+      // dataLayer 이벤트 전송
+      if (typeof window !== 'undefined') {
+        const w = window as any;
+        w.dataLayer = w.dataLayer || [];
+        w.dataLayer.push({
+          event: 'share',
+          result_id: id,
+          sender: sender?.name || ''
+        });
+      }
+      setTimeout(() => setCopyMsg(""), 3000);
+    } catch {
+      setCopyMsg("클립보드 복사에 실패했습니다.");
+      setTimeout(() => setCopyMsg(""), 3000);
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
+    // 최초 진입 시 view_result 이벤트 전송
+    if (typeof window !== 'undefined') {
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        event: 'view_result',
+        result_id: id,
+        sender: sender?.name || ''
+      });
+    }
     // 환경변수 기반으로 이미지 서버 주소 결정
     const captureServer = process.env.NEXT_PUBLIC_CAPTURE_SERVER_URL || "https://oow7izfiyiwfutsa.public.blob.vercel-storage.com";
     const imageUrl = `${captureServer}/images/${id}.png`;
@@ -87,9 +159,17 @@ export default function ResultClient({ id, subject, sender, receiver, translated
     <div className="min-h-screen w-full flex flex-col items-center justify-center" style={{background: "linear-gradient(180deg, #FF7AC3 0%, #A259F7 100%)"}}>
       <div className="flex flex-col items-center justify-center flex-1 grow">
         <PhoneFrame ref={frameRef} id="phone-frame">
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full relative">
             <StatusBar />
-            <MailHeader onBack={() => window.location.href = '/'} />
+            <MailHeader
+              onBack={() => window.location.href = '/'}
+              showOriginal={showOriginal}
+              setShowOriginal={setShowOriginal}
+              sender={sender}
+              id={id}
+              translatedText={translatedText}
+              originalText={originalText}
+            />
             <div className="flex-1 flex flex-col overflow-y-auto max-h-[500px]">
               <div className="px-5 py-4">
                 <h1 className="text-lg font-semibold mb-3">{subject}</h1>
@@ -101,12 +181,36 @@ export default function ResultClient({ id, subject, sender, receiver, translated
                   </div>
                 </div>
                 <div className="text-sm text-[#333] leading-relaxed space-y-2">
-                  {translatedText?.split('\n').map((line, i) => <p key={i}>{line}</p>)}
+                  {(showOriginal ? originalText : translatedText)?.split('\n').map((line, i) => <p key={i}>{line}</p>)}
                 </div>
               </div>
             </div>
+            {/* 결과 공유하기 버튼 (PC: 프레임 하단 바로 위) */}
+            <div className="hidden md:block w-full px-5 pb-4 absolute bottom-0 left-0">
+              <button
+                className="w-full py-3 rounded-xl bg-[#007aff] text-white font-bold text-base hover:bg-[#005fcc] transition-colors drop-shadow"
+                onClick={handleShare}
+              >
+                결과 공유하기
+              </button>
+              {copyMsg && (
+                <div className="mt-2 text-center text-sm text-blue-700 whitespace-pre-line">{copyMsg}</div>
+              )}
+            </div>
           </div>
         </PhoneFrame>
+        {/* 결과 공유하기 버튼 (MO: 화면 하단 바로 위) */}
+        <div className="block md:hidden w-full px-5 pb-4 fixed bottom-0 left-0 z-50 bg-white/80">
+          <button
+            className="w-full py-3 rounded-xl bg-[#007aff] text-white font-bold text-base hover:bg-[#005fcc] transition-colors drop-shadow"
+            onClick={handleShare}
+          >
+            결과 공유하기
+          </button>
+          {copyMsg && (
+            <div className="mt-2 text-center text-sm text-blue-700 whitespace-pre-line">{copyMsg}</div>
+          )}
+        </div>
       </div>
     </div>
   );
