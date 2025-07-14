@@ -5,6 +5,20 @@ import { useState, useEffect } from 'react';
 import PhoneFrame from '../components/PhoneFrame';
 import SwipeToStart from '../components/SwipeToStart';
 
+export const metadata = {
+  title: "당신이 받은 메일.. 진심일까요? | K직장인 속마음 번역기",
+  description: "K직장인 속마음 번역기는 이메일의 진짜 속마음을 번역해주는 서비스입니다. 받은 메일의 본문을 입력하고, 발신자의 진심을 확인해보세요.",
+  openGraph: {
+    title: "당신이 받은 메일.. 진심일까요? | K직장인 속마음 번역기",
+    description: "K직장인 속마음 번역기는 이메일의 진짜 속마음을 번역해주는 서비스입니다.",
+    url: "https://111111-pi.vercel.app/",
+    images: ["/assets/kworker-icon.png"],
+  },
+  alternates: {
+    canonical: "https://111111-pi.vercel.app/",
+  },
+};
+
 export default function Home() {
   const router = useRouter();
   const [fadeOut, setFadeOut] = useState(false);
@@ -44,14 +58,16 @@ export default function Home() {
             <div className="text-sm font-medium text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)] mb-2 md:text-center">{today}</div>
             <div className="font-bebas text-7xl font-black tracking-widest mb-4 md:text-center text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">{now}</div>
             {/* 푸시 알림 스타일 카드 */}
-            <div className="w-full max-w-xs bg-white/70 border border-gray-200/40 rounded-2xl p-4 mb-8 shadow-lg backdrop-blur-md md:my-0 md:mx-auto">
+            <div className="w-full max-w-xs bg-white/50 border border-gray-200/40 rounded-2xl p-4 mb-8 shadow-lg backdrop-blur-md md:my-0 md:mx-auto">
               <div className="flex items-center gap-2 text-xs font-semibold opacity-80 mb-1">
-                <div className="w-5 h-5 bg-pink-100 rounded mr-2" />
+                <a href="https://osoma.kr/" target="_blank" rel="noopener noreferrer">
+                  <img src="/assets/kworker-icon.png" alt="K직장인 아이콘" width={24} height={24} className="mr-2" />
+                </a>
                 K직장인 속마음 번역기
               </div>
               <div className="mt-1">
                 <div className="font-bold text-sm">당신이 받은 메일.. 진심일까요?</div>
-                <div className="text-xs opacity-90 mt-1 leading-relaxed">메일 발신/수신 정보를 입력하고, 실제 속마음을 확인해보세요.</div>
+                <div className="text-xs opacity-90 mt-1 leading-relaxed">일하면서 쎄~~한 느낌🤷‍♂️을 받았던 이메일의 발신자와 본문을 입력하고, 발신자의 실제 속마음을 확인해보세요.</div>
               </div>
             </div>
           </div>

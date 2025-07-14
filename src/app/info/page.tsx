@@ -45,6 +45,20 @@ function AppHeader() {
   );
 }
 
+export const metadata = {
+  title: "당신이 받은 메일의 정보를 입력해주세요. | K직장인 속마음 번역기",
+  description: "받은 메일의 발신자와 본문을 입력하면, K직장인 속마음 번역기가 진심을 분석해드립니다.",
+  openGraph: {
+    title: "당신이 받은 메일의 정보를 입력해주세요. | K직장인 속마음 번역기",
+    description: "받은 메일의 발신자와 본문을 입력하면, K직장인 속마음 번역기가 진심을 분석해드립니다.",
+    url: "https://111111-pi.vercel.app/info",
+    images: ["/assets/kworker-icon.png"],
+  },
+  alternates: {
+    canonical: "https://111111-pi.vercel.app/info",
+  },
+};
+
 export default function InfoPage() {
   const [from, setFrom] = useState("");
   const [body, setBody] = useState("");
@@ -109,6 +123,16 @@ export default function InfoPage() {
         setError('AI 변환 결과가 비어 있습니다.');
         setLoading(false);
         return;
+      }
+      // GTM 이벤트: 번역 성공
+      if (typeof window !== 'undefined') {
+        const w = window as any;
+        w.dataLayer = w.dataLayer || [];
+        w.dataLayer.push({
+          event: 'translate_complete',
+          sender: from,
+          email_contents: body.replace(/\n/g, ' ').slice(0, 80)
+        });
       }
       console.log('save-result 요청 직전', translateData.result);
       // 2. 결과 저장

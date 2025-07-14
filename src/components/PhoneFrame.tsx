@@ -36,7 +36,7 @@ const PhoneFrame = forwardRef<HTMLDivElement, { children: React.ReactNode, id?: 
         {/* 스마트폰 화면 */}
         <div
           className={isPc ? "w-[280px] h-[610px] bg-white rounded-[20px] overflow-hidden flex flex-col relative shadow-inner" : "flex-1 flex flex-col h-full min-h-0"}
-          style={isPc && innerBgImageUrl ? { backgroundImage: `url(${innerBgImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+          style={innerBgImageUrl ? { backgroundImage: `url(${innerBgImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
         >
           {children}
           {isPc && (

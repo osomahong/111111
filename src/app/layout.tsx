@@ -32,10 +32,27 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning>
+      <head>
+        {/* Google Tag Manager */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-T9JLT3VC');
+        ` }} />
+        {/* End Google Tag Manager */}
+        <link rel="icon" href="/assets/kworker-icon.png" type="image/png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansKR.variable} font-sans antialiased min-h-screen w-full`}
         style={{background: "linear-gradient(180deg, #FF7AC3 0%, #A259F7 100%)"}}
       >
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T9JLT3VC" height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe>
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
         <Providers>{children}</Providers>
       </body>
     </html>

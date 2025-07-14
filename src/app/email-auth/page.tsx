@@ -21,6 +21,20 @@ function getToday() {
   return `${d.getMonth() + 1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
 }
 
+export const metadata = {
+  title: "실제 사용하는 이메일을 인증해주세요. | K직장인 속마음 번역기",
+  description: "이메일 인증을 통해 안전하게 서비스를 이용하세요. 입력하신 이메일은 저장되지 않습니다.",
+  openGraph: {
+    title: "실제 사용하는 이메일을 인증해주세요. | K직장인 속마음 번역기",
+    description: "이메일 인증을 통해 안전하게 서비스를 이용하세요.",
+    url: "https://111111-pi.vercel.app/email-auth",
+    images: ["/assets/kworker-icon.png"],
+  },
+  alternates: {
+    canonical: "https://111111-pi.vercel.app/email-auth",
+  },
+};
+
 export default function EmailAuthPage() {
   const [now, setNow] = useState(getNow());
   const [today, setToday] = useState(getToday());
@@ -62,6 +76,11 @@ export default function EmailAuthPage() {
         setLoading(false);
         return;
       }
+      if (typeof window !== 'undefined') {
+        const w = window as any;
+        w.dataLayer = w.dataLayer || [];
+        w.dataLayer.push({ event: 'auth_complete' });
+      }
       localStorage.setItem("email-auth-ok", "1");
       router.replace("/info");
     } catch (e) {
@@ -84,7 +103,8 @@ export default function EmailAuthPage() {
             <div className="font-bebas text-7xl font-black tracking-widest mb-4 md:text-center text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">{now}</div>
             {/* 이메일 입력 */}
             <form className="w-full max-w-xs mb-8" onSubmit={handleSubmit} autoComplete="off">
-              <div className="mt-10 mb-4 text-base font-semibold text-white text-center drop-shadow">이메일 주소를 입력하세요</div>
+              <div className="mt-10 mb-0 text-base font-semibold text-white text-center drop-shadow">이메일 주소를 입력하세요</div>
+              <div className="mb-4 text-red-300 text-center opacity-80" style={{ fontSize: '10px' }}>*이메일은 개인정보이므로 저장되지 않습니다.</div>
               <input
                 type="email"
                 className="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-lg text-white text-center placeholder:text-white/70 drop-shadow focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"

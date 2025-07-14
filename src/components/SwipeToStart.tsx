@@ -43,7 +43,7 @@ export default function SwipeToStart({ onSuccess, label = '눌러서 시작' }: 
     if (dragX > maxDrag * 0.85) {
       setCompleted(true);
       setTimeout(() => {
-        onSuccess();
+        handleSuccess();
         setCompleted(false);
         setDragX(0);
       }, 300);
@@ -75,13 +75,23 @@ export default function SwipeToStart({ onSuccess, label = '눌러서 시작' }: 
     if (dragX > maxDrag * 0.85) {
       setCompleted(true);
       setTimeout(() => {
-        onSuccess();
+        handleSuccess();
         setCompleted(false);
         setDragX(0);
       }, 300);
     } else {
       setDragX(0);
     }
+  }
+
+  // onSuccess 호출 래핑
+  function handleSuccess() {
+    if (typeof window !== 'undefined') {
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({ event: 'test_start' });
+    }
+    onSuccess();
   }
 
   // 항상 최신 핸들러를 useRef에 저장
@@ -116,7 +126,7 @@ export default function SwipeToStart({ onSuccess, label = '눌러서 시작' }: 
             if (!completed) {
               setCompleted(true);
               setTimeout(() => {
-                onSuccess();
+                handleSuccess();
                 setCompleted(false);
                 setDragX(0);
               }, 300);
