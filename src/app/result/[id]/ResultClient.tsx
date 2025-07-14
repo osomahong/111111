@@ -156,8 +156,8 @@ export default function ResultClient({ id, subject, sender, receiver, translated
   }, [id]);
   // 뒤로가기 등 클라이언트 전용 로직 필요시 추가
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center" style={{background: "linear-gradient(180deg, #FF7AC3 0%, #A259F7 100%)"}}>
-      <div className="flex flex-col items-center justify-center flex-1 grow">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center sm:bg-[linear-gradient(180deg,_#FF7AC3_0%,_#A259F7_100%)] bg-white">
+      <div className="flex flex-col items-center justify-center flex-1 grow w-full h-full">
         <PhoneFrame ref={frameRef} id="phone-frame">
           <div className="flex flex-col h-full relative">
             <StatusBar />
@@ -170,7 +170,8 @@ export default function ResultClient({ id, subject, sender, receiver, translated
               translatedText={translatedText}
               originalText={originalText}
             />
-            <div className="flex-1 flex flex-col overflow-y-auto max-h-[500px]">
+            {/* 결과 텍스트 영역: 프레임 내부에서만 스크롤, 버튼 위에 배치 */}
+            <div className="flex-1 flex flex-col overflow-y-auto pb-28 max-h-[calc(100vh-120px)] sm:max-h-[calc(100vh-220px)]">
               <div className="px-5 py-4">
                 <h1 className="text-lg font-semibold mb-3">{subject}</h1>
                 <div className="flex items-center mb-5">
@@ -185,8 +186,8 @@ export default function ResultClient({ id, subject, sender, receiver, translated
                 </div>
               </div>
             </div>
-            {/* 결과 공유하기 버튼 (PC: 프레임 하단 바로 위) */}
-            <div className="hidden md:block w-full px-5 pb-4 absolute bottom-0 left-0">
+            {/* 결과 공유하기 버튼: 프레임 내부 하단에 고정 */}
+            <div className="w-full px-5 pb-4 fixed bottom-0 left-1/2 -translate-x-1/2 max-w-md z-10">
               <button
                 className="w-full py-3 rounded-xl bg-[#007aff] text-white font-bold text-base hover:bg-[#005fcc] transition-colors drop-shadow"
                 onClick={handleShare}
@@ -199,18 +200,6 @@ export default function ResultClient({ id, subject, sender, receiver, translated
             </div>
           </div>
         </PhoneFrame>
-        {/* 결과 공유하기 버튼 (MO: 화면 하단 바로 위) */}
-        <div className="block md:hidden w-full px-5 pb-4 fixed bottom-0 left-0 z-50 bg-white/80">
-          <button
-            className="w-full py-3 rounded-xl bg-[#007aff] text-white font-bold text-base hover:bg-[#005fcc] transition-colors drop-shadow"
-            onClick={handleShare}
-          >
-            결과 공유하기
-          </button>
-          {copyMsg && (
-            <div className="mt-2 text-center text-sm text-blue-700 whitespace-pre-line">{copyMsg}</div>
-          )}
-        </div>
       </div>
     </div>
   );

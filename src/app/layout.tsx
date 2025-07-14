@@ -42,7 +42,7 @@ export default function RootLayout({
           })(window,document,'script','dataLayer','GTM-T9JLT3VC');
         ` }} />
         {/* End Google Tag Manager */}
-        <link rel="icon" href="/assets/kworker-icon.png" type="image/png" />
+        <link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansKR.variable} font-sans antialiased min-h-screen w-full`}
