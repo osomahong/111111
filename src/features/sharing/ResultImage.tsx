@@ -7,7 +7,7 @@ const SNS = [
     url: (img: string) => `https://www.instagram.com/create/story/?image=${encodeURIComponent(img)}`,
     icon: "📸",
   },
-  {ㄹ
+  {
     name: "트위터",
     url: (img: string) => `https://twitter.com/intent/tweet?text=K-직장인 속마음 변환 결과&url=${encodeURIComponent(img)}`,
     icon: "🐦",
