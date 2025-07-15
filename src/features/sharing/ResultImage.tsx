@@ -7,7 +7,7 @@ const SNS = [
     url: (img: string) => `https://www.instagram.com/create/story/?image=${encodeURIComponent(img)}`,
     icon: "📸",
   },
-  {
+  {ㄹ
     name: "트위터",
     url: (img: string) => `https://twitter.com/intent/tweet?text=K-직장인 속마음 변환 결과&url=${encodeURIComponent(img)}`,
     icon: "🐦",
@@ -39,11 +39,32 @@ export default function ResultImage({ result }: ResultImageProps) {
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<string>("");
 
-  const handleCapture = async () => {
-    setLoading(true);
-    setFeedback("");
-    // html2canvas 및 임시 캡처 코드 전체 삭제. 새로운 방식 적용 예정.
-  };
+const handleCapture = async () => {
+  setLoading(true);
+  setFeedback("");
+  try {
+    // 캡처할 URL: 현재 페이지의 전체 URL (og:image 용이면 result/[id] 페이지의 URL이어야 함)
+    const captureUrl = window.location.href;
+    // 필요하다면 특정 selector도 전달 가능 (예: "#capture-target")
+    const res = await fetch("https://111111-pi.vercel.app/api/capture", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: captureUrl,
+        // selector: "#캡처할요소ID", // 필요시 주석 해제
+        format: "png",
+        fullPage: false,
+      }),
+    });
+    if (!res.ok) throw new Error("캡처 서버 응답 오류");
+    const data = await res.json();
+    setImgUrl(data.imageUrl);
+    setFeedback("이미지 생성 완료!");
+  } catch (e) {
+    setFeedback("이미지 생성 실패");
+  }
+  setLoading(false);
+};
 
   const handleDownload = () => {
     if (!imgUrl) return;
